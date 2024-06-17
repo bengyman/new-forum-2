@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <link rel="stylesheet" href="forum.css">
+</head>
+<body>
+    <h1>All Posts</h1>
+    <div id="postsContainer"></div>
+
+    <script>
+        async function fetchPosts() {
+            try {
+                const response = await fetch('http://localhost:3001/api/posts');
+                const posts = await response.json();
+                console.log(posts); // Debug: Check the posts data
+
+                const postsContainer = document.getElementById('postsContainer');
+                postsContainer.innerHTML = ''; // Clear any existing content
+
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.textContent = 'Delete';
+
+                    deleteButton.addEventListener('click', async () => {
+                        if (confirm('Are you sure you want to delete this post?')) {
+                            await deletePost(post.post_id);
+                            postElement.remove();
+                        }
+                    });
+
+                    const editButton = document.createElement('button');
+                    editButton.className = 'edit-button';
+                    editButton.textContent = 'Edit';
+                    editButton.addEventListener('click', () => {
+                        window.location.href = `edit.html?id=${post.post_id}`;
+                    });
+
+                    const datetimeElement = document.createElement('div');
+                    datetimeElement.className = 'datetime';
+                    datetimeElement.textContent = new Date(post.createdAt).toLocaleString();
+
+                    const titleContainer = document.createElement('div');
+                    titleContainer.className = 'title-container';
+
+                    const titleElement = document.createElement('div');
+                    titleElement.className = 'title';
+                    titleElement.textContent = post.title;
+
+                    const residentElement = document.createElement('div');
+                    residentElement.className = 'resident';
+                    residentElement.textContent = `Posted by: ${post.resident ? post.resident.name : 'Unknown'}`;
+
+                    titleContainer.appendChild(titleElement);
+                    titleContainer.appendChild(residentElement);
+
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = post.tags ? post.tags : 'No Tags'; // Ensure tags are displayed
+
+                    const contentElement = document.createElement('div');
+                    contentElement.className = 'content';
+                    contentElement.textContent = post.content;
+
+                    if (post.imageUrl) {
+                        const imageAnchor = document.createElement('a');
+                        imageAnchor.href = post.imageUrl; // Assuming imageUrl is a valid URL
+                        imageAnchor.className = 'image-container';
+
+                        const imageElement = document.createElement('img');
+                        imageElement.src = post.imageUrl;
+                        imageElement.alt = 'Post Image';
+                        imageElement.className = 'post-image';
+                        
+                        imageAnchor.appendChild(imageElement);
+                        postElement.appendChild(imageAnchor);
+                    }
+
+                    const reportButton = document.createElement('button');
+                    reportButton.textContent = `Report (${post.reports})`;
+                    reportButton.disabled = localStorage.getItem(`reported-${post.post_id}`) ? true : false;
+
+                    reportButton.addEventListener('click', async () => {
+                        await reportPost(post.post_id);
+                        reportButton.textContent = `Report (${post.reports + 1})`;
+                        reportButton.disabled = true;
+                        localStorage.setItem(`reported-${post.post_id}`, true);
+                    });
+
+                    postElement.appendChild(deleteButton);
+                    postElement.appendChild(editButton); // Ensure the edit button is appended here
+                    postElement.appendChild(datetimeElement);
+                    postElement.appendChild(titleContainer);
+                    postElement.appendChild(tagElement);
+                    postElement.appendChild(contentElement);
+                    postElement.appendChild(reportButton);
+
+                    postsContainer.appendChild(postElement);
+                });
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+            }
+        }
+
+        async function deletePost(postId) {
+            try {
+                const response = await fetch(`http://localhost:3001/api/posts/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete post');
+                }
+
+                const data = await response.json();
+                console.log(data); // Debug: Check the response
+            } catch (error) {
+                console.error('Error deleting post:', error);
+            }
+        }
+
+        async function reportPost(postId) {
+            try {
+                const response = await fetch(`http://localhost:3001/api/posts/${postId}/report`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to report post');
+                }
+
+                const data = await response.json();
+                console.log(data); // Debug: Check the response
+            } catch (error) {
+                console.error('Error reporting post:', error);
+            }
+        }
+
+        // Fetch posts when the page loads
+        window.onload = fetchPosts;
+    </script>
+</body>
+</html>

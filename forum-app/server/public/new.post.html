@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Details</title>
+    <link rel="stylesheet" href="/forum.css"> <!-- Ensure correct path to your CSS file -->
+</head>
+<body>
+    <div id="postContainer"></div>
+
+    <script>
+        async function fetchPost() {
+            const postId = window.location.pathname.split('/').pop();
+
+            try {
+                const response = await fetch(`/api/posts/${postId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch post: ${response.status}`);
+                }
+                const post = await response.json();
+
+                const postContainer = document.getElementById('postContainer');
+                postContainer.innerHTML = ''; // Clear any existing content
+
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+
+                const datetimeElement = document.createElement('div');
+                datetimeElement.className = 'datetime';
+                datetimeElement.textContent = new Date(post.createdAt).toLocaleString();
+
+                const titleElement = document.createElement('div');
+                titleElement.className = 'title';
+                titleElement.textContent = post.title;
+
+                const userElement = document.createElement('div');
+                userElement.className = 'user';
+                userElement.textContent = post.user.name;
+
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.textContent = post.tags ? post.tags : 'No Tags';
+
+                const contentElement = document.createElement('div');
+                contentElement.className = 'content';
+                contentElement.textContent = post.content;
+
+                if (post.imageUrl) {
+                    const imageElement = document.createElement('img');
+                    imageElement.src = post.imageUrl;
+                    imageElement.alt = 'Post Image';
+                    imageElement.className = 'post-image';
+
+                    postElement.appendChild(datetimeElement);
+                    postElement.appendChild(titleElement);
+                    postElement.appendChild(tagElement);
+                    postElement.appendChild(imageElement); // Append the image element here
+                    postElement.appendChild(userElement);
+                    postElement.appendChild(contentElement);
+                } else {
+                    postElement.appendChild(datetimeElement);
+                    postElement.appendChild(titleElement);
+                    postElement.appendChild(tagElement);
+                    postElement.appendChild(userElement);
+                    postElement.appendChild(contentElement);
+                }
+
+                postContainer.appendChild(postElement);
+            } catch (error) {
+                console.error('Error fetching post:', error);
+            }
+        }
+
+        // Fetch post when the page loads
+        window.onload = fetchPost;
+    </script>
+</body>
+</html>

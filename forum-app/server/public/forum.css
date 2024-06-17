@@ -1,0 +1,81 @@
+.post {
+    position: relative; /* Add this line */
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.datetime {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px; /* Adjust margin as needed */
+}
+
+.resident {
+    font-size: 14px;
+    color: #888;
+}
+
+.tag {
+    display: inline-block;
+    font-size: 14px;
+    color: #555;
+    background-color: #e0e0e0;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+}
+
+.content {
+    margin-top: 10px;
+}
+
+.report-button {
+    margin-top: 10px;
+}
+
+.image-container {
+    display: block;
+    margin-top: 10px;
+}
+
+.post-image {
+    max-width: 30%;
+    height: auto;
+    max-height: 300px; /* Set your desired maximum height */
+    width: auto;
+}
+
+.delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.edit-button {
+    position: absolute; /* Add this line */
+    top: 10px; /* Add this line */
+    right: 70px; /* Adjust this value to position the button correctly relative to the delete button */
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}
